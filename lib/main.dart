@@ -62,35 +62,31 @@ class _MyHomePageState extends State<MyHomePage> {
     );
 
     if (res.statusCode == 200) {
-      dynamic str = res.body;
+      String str = res.body;
 
-      print(str);
+      Map mapData = json.decode(str);
 
-      // Map mapData = json.decode(str);
-      var mapData = json.decode(str);
-      print((mapData.runtimeType));
+      int resLength = mapData['facility_name'].length;
 
-      // int resLength = mapData['facility_name'].length;
+      print(resLength);
 
-      // print(resLength);
+      List facilityNames = mapData['faci lity_name'].values.toList();
+      List facilityTypes = mapData['facility_type'].values.toList();
+      List facilityCommunities = mapData['community'].values.toList();
+      List gpsLongitudes = mapData['X_gps_longitude'].values.toList();
+      List gpsLatitudes = mapData['X_gps_latitude'].values.toList();
 
-      // List facilityNames = mapData['faci lity_name'].values.toList();
-      // List facilityTypes = mapData['facility_type'].values.toList();
-      // List facilityCommunities = mapData['community'].values.toList();
-      // List gpsLongitudes = mapData['X_gps_longitude'].values.toList();
-      // List gpsLatitudes = mapData['X_gps_latitude'].values.toList();
+      for (int i = 0; i < resLength; i++) {
+        _hospitals.add(Hospital(
+          name: facilityNames[i],
+          type: facilityTypes[i],
+          community: facilityCommunities[i],
+          longitude: gpsLongitudes[i],
+          latitude: gpsLatitudes[i],
+        ));
+      }
 
-      // for (int i = 0; i < resLength; i++) {
-      //   _hospitals.add(Hospital(
-      //     name: facilityNames[i],
-      //     type: facilityTypes[i],
-      //     community: facilityCommunities[i],
-      //     longitude: gpsLongitudes[i],
-      //     latitude: gpsLatitudes[i],
-      //   ));
-      // }
-
-      // print(_hospitals.length);
+      print(_hospitals.length);
     }
 
     setState(() {});
