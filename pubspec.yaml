@@ -36,6 +36,9 @@ dependencies:
   cupertino_icons: ^1.0.2
   # for location
   location: ^4.3.0
+  # for maps
+  flutter_map: ^0.14.0
+  latlong2: ^0.8.1
 
 dev_dependencies:
   flutter_test:

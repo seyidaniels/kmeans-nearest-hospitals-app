@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
 import 'package:nearesthospital/location_service.dart';
+import 'package:flutter_map/flutter_map.dart';
 
 void main() {
   runApp(const MyApp());
@@ -32,6 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
   LocationData _currentLocation;
 
   Future _getCurrentLocation() async {
+    setState(() {});
     _currentLocation = await LocationService().requestLocation();
     setState(() {});
   }
@@ -39,30 +42,63 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Nearest Hospital"),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'Location below:',
-            ),
-            Text(
-              _currentLocation != null
-                  ? "${_currentLocation.latitude}, ${_currentLocation.longitude}"
-                  : "Location is empty",
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
+      appBar: AppBar(title: const Text("Nearest Hospital")),
+      body: _buildBody(),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _getCurrentLocation(),
         tooltip: 'Get Current Location',
         child: const Icon(Icons.pin_drop),
       ),
     );
+  }
+
+  Widget _buildBody() {
+    Widget child;
+    if (_currentLocation != null) {
+      child = FlutterMap(
+        options: MapOptions(
+          center: LatLng(
+            _currentLocation?.latitude,
+            _currentLocation?.longitude,
+          ),
+          zoom: 15.0,
+          enableScrollWheel: false,
+          allowPanningOnScrollingParent: false,
+        ),
+        layers: [
+          TileLayerOptions(
+            urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            subdomains: ['a', 'b', 'c'],
+            attributionBuilder: (_) {
+              return const Text("© OpenStreetMap contributors");
+            },
+          ),
+          MarkerLayerOptions(
+            markers: [
+              Marker(
+                width: 80.0,
+                height: 80.0,
+                point: LatLng(
+                  _currentLocation?.latitude,
+                  _currentLocation?.longitude,
+                ),
+                builder: (ctx) => const SizedBox(
+                  child: Icon(
+                    Icons.pin_drop,
+                    color: Colors.red,
+                    size: 60,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
+    } else {
+      child = const Center(
+        child: Text("Please press the icon below"),
+      );
+    }
+    return child;
   }
 }
