@@ -64,13 +64,11 @@ class _MyHomePageState extends State<MyHomePage> {
     if (res.statusCode == 200) {
       String str = res.body;
 
-      Map mapData = json.decode(str);
+      Map mapData = json.decode(json.decode(str));
 
       int resLength = mapData['facility_name'].length;
 
-      print(resLength);
-
-      List facilityNames = mapData['faci lity_name'].values.toList();
+      List facilityNames = mapData['facility_name'].values.toList();
       List facilityTypes = mapData['facility_type'].values.toList();
       List facilityCommunities = mapData['community'].values.toList();
       List gpsLongitudes = mapData['X_gps_longitude'].values.toList();
@@ -85,8 +83,6 @@ class _MyHomePageState extends State<MyHomePage> {
           latitude: gpsLatitudes[i],
         ));
       }
-
-      print(_hospitals.length);
     }
 
     setState(() {});
@@ -114,7 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
             _currentLocation?.latitude,
             _currentLocation?.longitude,
           ),
-          zoom: 15.0,
+          zoom: 13.0,
           enableScrollWheel: false,
           allowPanningOnScrollingParent: false,
         ),
