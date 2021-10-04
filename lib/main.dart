@@ -1,8 +1,13 @@
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
-import 'package:nearesthospital/location_service.dart';
 import 'package:flutter_map/flutter_map.dart';
+
+import 'hospital_model.dart';
+import 'location_service.dart';
 
 void main() {
   runApp(const MyApp());
@@ -32,10 +37,62 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   LocationData _currentLocation;
+  final List<Hospital> _hospitals = [];
 
   Future _getCurrentLocation() async {
-    setState(() {});
     _currentLocation = await LocationService().requestLocation();
+    setState(() {});
+    if (_currentLocation != null) {
+      _getHosptials();
+    }
+  }
+
+  Future _getHosptials() async {
+    Uri uri = Uri.parse("https://seyicluster-api.herokuapp.com/predict");
+
+    final http.Response res = await http.post(
+      uri,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode({
+        "X_gps_longitude": _currentLocation.longitude,
+        "X_gps_latitude": _currentLocation.latitude,
+      }),
+    );
+
+    if (res.statusCode == 200) {
+      dynamic str = res.body;
+
+      print(str);
+
+      // Map mapData = json.decode(str);
+      var mapData = json.decode(str);
+      print((mapData.runtimeType));
+
+      // int resLength = mapData['facility_name'].length;
+
+      // print(resLength);
+
+      // List facilityNames = mapData['faci lity_name'].values.toList();
+      // List facilityTypes = mapData['facility_type'].values.toList();
+      // List facilityCommunities = mapData['community'].values.toList();
+      // List gpsLongitudes = mapData['X_gps_longitude'].values.toList();
+      // List gpsLatitudes = mapData['X_gps_latitude'].values.toList();
+
+      // for (int i = 0; i < resLength; i++) {
+      //   _hospitals.add(Hospital(
+      //     name: facilityNames[i],
+      //     type: facilityTypes[i],
+      //     community: facilityCommunities[i],
+      //     longitude: gpsLongitudes[i],
+      //     latitude: gpsLatitudes[i],
+      //   ));
+      // }
+
+      // print(_hospitals.length);
+    }
+
     setState(() {});
   }
 
@@ -90,6 +147,25 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               ),
+              ..._hospitals
+                  .map(
+                    (e) => Marker(
+                      width: 80.0,
+                      height: 80.0,
+                      point: LatLng(
+                        e.latitude,
+                        e.longitude,
+                      ),
+                      builder: (ctx) => const SizedBox(
+                        child: Icon(
+                          Icons.pin_drop,
+                          color: Colors.green,
+                          size: 60,
+                        ),
+                      ),
+                    ),
+                  )
+                  .toList(),
             ],
           ),
         ],
